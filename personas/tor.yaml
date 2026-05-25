@@ -1,0 +1,38 @@
+# A persona that routes through a local Tor daemon. Slow but anonymous.
+# Requires Tor running on localhost:9050 (the default control port).
+# Not recommended for use currently
+# Pair with a Tor-equivalent TLS profile so the JA3 doesn't betray
+# "Firefox UA but Chrome TLS".
+
+name: tor
+
+profile: tor145
+region: us-east
+
+upstream:
+  type: tor
+  # Use 'per-request' if you want a new Tor circuit on each request.
+  # Note that NEWNYM signaling requires a Tor control port + ControlPort
+  # password, which this implementation doesn't yet wire up.
+  rotation: on-failure
+
+cookies:
+  path: ~/.phantom/cookies/tor.json
+
+dns:
+  mode: doh
+  resolver: cloudflare
+
+rate_limit:
+  per_minute: 10
+  burst: 3
+
+jitter_ms: [500, 2000]
+
+on_block:
+  detectors: [cloudflare, akamai, perimeterx, recaptcha, hcaptcha, rate_limit]
+  action: cool_down
+  cool_down_s: 120
+
+log:
+  path: ~/.phantom/logs/tor.jsonl

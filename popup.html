@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Phantom Shield</title>
+<style>
+  :root { color-scheme: dark light; --accent: #4ade80; --muted: #888; --bg: #1a1a1a; --bg-soft: #242424; --fg: #e8e8e8; --border: #333; }
+  @media (prefers-color-scheme: light) { :root { --bg: #fff; --bg-soft: #f5f5f5; --fg: #1a1a1a; --border: #ddd; --muted: #666; } }
+  html, body { margin: 0; padding: 0; }
+  body { font: 13px/1.4 system-ui, sans-serif; width: 340px; background: var(--bg); color: var(--fg); }
+
+  header { padding: 12px 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .brand { font-weight: 700; font-size: 14px; letter-spacing: .02em; }
+  .count { color: var(--muted); font-variant-numeric: tabular-nums; font-size: 12px; }
+
+  .bridge-badge { display: flex; align-items: center; margin-left: 6px; }
+  .bridge-dot { width: 8px; height: 8px; border-radius: 50%; background: #888; transition: background .15s; }
+  .bridge-dot.ok       { background: #4ade80; }
+  .bridge-dot.fallback { background: #facc15; }
+  .bridge-dot.err      { background: #ef4444; }
+
+  .profile-row { padding: 10px 14px; background: var(--bg-soft); border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 4px; }
+  .profile-row label { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 600; }
+  .profile-row select { font: inherit; background: var(--bg); color: var(--fg); border: 1px solid var(--border); border-radius: 4px; padding: 6px 8px; width: 100%; }
+  .profile-row .ua-preview { color: var(--muted); font-family: ui-monospace, monospace; font-size: 10.5px; word-break: break-all; line-height: 1.35; }
+  .profile-row .explain { color: var(--muted); font-size: 11px; line-height: 1.4; opacity: 0.85; }
+
+  .master { padding: 10px 14px; background: var(--bg-soft); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
+  .master input { transform: scale(1.2); accent-color: var(--accent); }
+  .master label { display: flex; align-items: center; gap: 10px; cursor: pointer; flex: 1; font-weight: 600; }
+  .master.off label { color: var(--muted); }
+  .master .hint { color: var(--muted); font-size: 11px; font-weight: 400; }
+
+  .list { max-height: 360px; overflow-y: auto; padding: 4px 0; }
+  .list.disabled { opacity: .35; pointer-events: none; }
+
+  .group-title { padding: 10px 14px 4px; font-size: 10px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); font-weight: 600; }
+  .row { display: flex; align-items: center; gap: 10px; padding: 6px 14px; cursor: pointer; }
+  .row:hover { background: var(--bg-soft); }
+  .row input { accent-color: var(--accent); flex-shrink: 0; }
+  .row-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .row-surface { color: var(--muted); font-size: 10.5px; font-family: ui-monospace, monospace; margin-left: auto; max-width: 50%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  footer { padding: 10px 14px; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 10px; background: var(--bg-soft); }
+  button { font: inherit; background: var(--bg); border: 1px solid var(--border); color: var(--fg); border-radius: 4px; padding: 6px 10px; cursor: pointer; }
+  button:hover { background: var(--bg-soft); border-color: var(--accent); }
+  button:active { transform: translateY(1px); }
+  footer a { margin-left: auto; color: var(--muted); text-decoration: none; font-size: 12px; }
+  footer a:hover { color: var(--fg); }
+
+  .saved { color: var(--accent); opacity: 0; transition: opacity .15s; font-size: 11px; }
+  .saved.on { opacity: 1; }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">Phantom Shield</div>
+  <div class="count" id="count">- / -</div>
+  <div class="bridge-badge" id="bridgeBadge" title="Bridge status">
+    <span class="bridge-dot" id="bridgeDot"></span>
+  </div>
+</header>
+
+<section class="profile-row">
+  <label for="profile">TLS Profile</label>
+  <select id="profile"></select>
+  <div class="ua-preview" id="uaPreview"></div>
+  <div class="explain" id="profileExplain"></div>
+</section>
+
+<section class="profile-row">
+  <label for="region">Region</label>
+  <select id="region"></select>
+  <div class="ua-preview" id="regionHint"></div>
+  <div class="explain" id="regionExplain"></div>
+</section>
+
+<section class="profile-row">
+  <label for="resolution">Resolution</label>
+  <select id="resolution"></select>
+  <div class="ua-preview" id="resolutionHint"></div>
+  <div class="explain" id="resolutionExplain"></div>
+</section>
+
+<section class="master" id="masterRow">
+  <label>
+    <input type="checkbox" id="master" />
+    <span>
+      Enabled
+      <div class="hint" id="masterHint">All phantom functions active</div>
+    </span>
+  </label>
+</section>
+
+<div id="list" class="list"></div>
+
+<footer>
+  <button id="reload" title="Reload current tab to apply">Reload tab</button>
+  <span id="saved" class="saved">Saved</span>
+  <a href="#" id="options">Options →</a>
+</footer>
+
+<script src="profiles.js"></script>
+<script src="popup.js"></script>
+</body>
+</html>

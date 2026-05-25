@@ -1,0 +1,20 @@
+{
+  "name": "phantom-shield",
+  "version": "0.5.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test --test-reporter=spec tests/",
+    "test:py": "/opt/tls-mitm/venv/bin/python -m pytest tests/python/",
+    "test:sh": "tests/install/test_install_sh.sh",
+    "test:launcher": "tests/launcher/test_phantom_browser.sh",
+    "test:all": "npm run test && npm run test:py && npm run test:sh && npm run test:launcher",
+    "check": "node scripts/check-profiles.mjs",
+    "generate-profiles-json": "node scripts/generate-profiles-json.mjs",
+    "install:bridge": "./scripts/install.sh",
+    "phantom": "./scripts/phantom-browser.sh"
+  },
+  "devDependencies": {
+    "jsdom": "^25.0.0"
+  }
+}

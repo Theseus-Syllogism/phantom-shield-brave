@@ -1,0 +1,61 @@
+# Example persona - copy to ~/.phantom/personas/<your-name>.yaml and edit.
+# Every section except `name` is optional; defaults are documented inline.
+#
+# Load programmatically:    Persona.load("example")
+# Use from CLI:             phantom get https://... --persona example
+
+name: example
+
+# Picks a curl_cffi BrowserType. Drives the TLS ClientHello (JA3/JA4), ALPN
+# ordering, HTTP/2 frame sequence, and the canonical User-Agent string.
+# See `phantom profiles list` for the full catalogue.
+profile: chrome146
+
+# Drives Accept-Language and timezone-aware logic (when callers need it).
+# Orthogonal to the profile - a US Chrome user appearing from Tokyo is one
+# common pattern.
+region: us-east
+
+# Upstream proxy. Without one, requests go direct from your real IP.
+# Types: 'direct' (default), 'pool', 'tor'.
+# Rotation: 'sticky-Nh|Nm|Ns', 'round-robin', 'per-request', 'on-failure'.
+upstream:
+  type: pool
+  rotation: sticky-30m
+  servers:
+    - socks5://user:pass@proxy-us-1.example.net:11000
+    - socks5://user:pass@proxy-us-2.example.net:11000
+    - socks5://user:pass@proxy-us-3.example.net:11000
+
+# Where to persist cookies between program runs. Per-persona isolation.
+cookies:
+  path: ~/.phantom/cookies/example.json
+  persist: true
+
+# Resolve hostnames via DNS-over-HTTPS instead of the OS resolver. Avoids
+# leaving queries in ISP logs. Resolver options: cloudflare, google, quad9.
+dns:
+  mode: doh
+  resolver: cloudflare
+
+# Token bucket. `burst` is the max instantaneous spike.
+rate_limit:
+  per_minute: 30
+  burst: 5
+
+# Uniform-random sleep between requests in milliseconds. Disrupts the
+# request-as-fast-as-possible timing fingerprint.
+jitter_ms: [200, 800]
+
+# Block / challenge detection. `action` runs when at least one detector fires.
+# Actions: rotate_upstream (next proxy), cool_down (sleep), abort (raise).
+on_block:
+  detectors: [cloudflare, akamai, perimeterx, recaptcha, hcaptcha, rate_limit, generic_403]
+  action: rotate_upstream
+  cool_down_s: 60
+
+# JSONL request log. One line per request: timestamp, method, URL, status,
+# latency, which upstream served it, any block signals.
+log:
+  path: ~/.phantom/logs/example.jsonl
+  enabled: true
