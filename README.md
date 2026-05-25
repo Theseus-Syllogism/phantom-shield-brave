@@ -43,12 +43,12 @@ The three core halves are decoupled. With the bridge off, the JS phantoms still 
 - **Anti-bot research and red-team testing of your own systems.** See exactly what a coherent client sends, with TLS, User-Agent, UA Client Hints, navigator state, and screen state all consistent with one another. Incoherence (a Chrome JA3 with a Firefox User-Agent, or a desktop screen with a mobile profile) is the classic detection signal; this keeps every layer aligned.
 - **Population blending.** Present as a common cohort (Chrome 146 on Windows, Safari on iOS) without hand-maintaining UA strings, header lists, navigator overrides, and TLS profiles in three separate places.
 - **Privacy research.** A controlled environment where you can flip individual fingerprint surfaces on and off and observe the effect on a fingerprinting probe.
-- **Locale and timezone control.** Appear from a different region without the lie being obvious from a `new Date().getTimezoneOffset()` or `Intl.DateTimeFormat().resolvedOptions()` check.
+- **Locale and timezone control.** Appear from a different region without the lie being obvious from a `new Date().getTimezoneOffset()` or `Intl.DateTimeFormat().resolvedOptions()` check. This is very useful for say, utilizing a VPN and evading or protecting against location/locale based checks alongside metadata collection.
 - **OSINT collection over hostile networks.** The Python client pulls public data through rotating upstreams and a real-browser TLS fingerprint, getting past WAFs that block default scrapers, while DoH keeps queries out of ISP logs.
 
-If you only want "be a bit less trackable on the open web," Brave's built-in farbling plus uBlock Origin is enough. Phantom Shield exists for the cases above, where coherence and TLS-level fidelity matter.
+If you only want "be a bit less trackable on the open web," Brave's built-in farbling plus uBlock Origin is enough. Phantom Shield exists for the cases above, where additional OPSEC is a requirement.
 
-A note on Tor: this toolkit is built for *blending into the general web population*, which is the opposite of Tor Browser's *uniform anonymity-set* model. Do not load the extension into Tor Browser (it would make you more unique, not less). The Python client's Tor support is for collection against Tor-hostile targets, not for source protection. See [`docs/`](docs/) for the longer discussion.
+A note on Tor: this toolkit is built for *blending into the general web population*, which is the opposite of Tor Browser's *uniform anonymity-set* model. Do not load the extension into Tor Browser (it would make you more identifiable and unique amongst other Tor clients, not less). The Python client's Tor support is for collection against Tor-hostile targets, not for source protection. See [`docs/`](docs/) for the longer discussion.
 
 ---
 
@@ -204,7 +204,7 @@ Forty surfaces, grouped by signal strength. All default on except the experiment
 Each row in the options page names the exact API surface it covers. Disable any that breaks a site you need.
 
 ### Region
-
+USEFUL FOR VPN BASED BROWSING
 Twelve presets (US East/Central/West, UK, Germany, France, Japan, Korea, Brazil, India, Australia, Canada). A region drives, all coherently:
 
 - `Date.prototype.getTimezoneOffset`, with DST resolved per-date via `Intl.DateTimeFormat(..., {timeZoneName:'longOffset'})`.
@@ -382,7 +382,5 @@ docs/superpowers/          specs and implementation plans
 
 ## Roadmap
 
-- **Firefox port.** Shares the bridge and most phantoms; needs the MAIN-world script-injection workaround and Gecko-specific leak phantoms (`navigator.buildID`, `oscpu`).
+- **Firefox port.** Work in progress. Shares the bridge and most phantoms; needs the MAIN-world script-injection workaround and Gecko-specific leak phantoms (`navigator.buildID`, `oscpu`).
 - **Per-port extension wiring.** The launcher already owns the port; surfacing a non-default port through to the extension (an `X-Phantom-Port` probe header) is planned so custom-port installs need no manual proxy step.
-- **macOS launcher.** Same model as Linux/Windows, using the Keychain.
-- See [`docs/superpowers/`](docs/superpowers/) for the design specs and implementation plans behind the hardening pass, the plug-n-play installer, and the Phantom Browser launcher.
